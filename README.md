@@ -4,9 +4,10 @@ Simple Add-in for Body/Component Display
 ## Usage:
 First see [How to install sample Add-Ins and Scripts](https://rawgit.com/AutodeskFusion360/AutodeskFusion360.github.io/master/Installation.html)
 
-This addin allows you to adjust the display of bodies and components in the graphicswindow.
+This addin allows you to adjust the display of bodies and components in the graphics window.
 
 First you can show all components or bodies.  
+
 Alternatively, you can "Show Hidden" which will make all hidden bodies/compnents displayed and all shown entities become hidden.  Essentially inveting the hide/show state of the display.
 
 Here is a quick description of the useful workflow:
