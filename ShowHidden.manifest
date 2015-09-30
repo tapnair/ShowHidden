@@ -1,0 +1,12 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"0df8a06f-5de4-4877-8608-8cf42449c570",
+	"author":	"Patrick Rainsberry",
+	"description":	{
+		"":	"Advanced Hide and Show commands\t"
+	},
+	"version":	"1.0",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac"
+}
