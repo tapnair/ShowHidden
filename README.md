@@ -16,7 +16,7 @@ Here is a quick description of the useful workflow:
   * Select: Inspect/Show Hidden
   * Select: Show Hiddden and Bodies
   * Now all the previously hidden bodies will be displayed.
-  * #Hide the body you wanted to show originally
+  * Hide the body you wanted to show originally
   * Select: Inspect/Show Hidden
   * Select: Show Hiddden and Bodies
   * You now have the previous state with the desired bodies shown
