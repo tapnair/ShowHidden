@@ -7,6 +7,8 @@ First see [How to install sample Add-Ins and Scripts](https://rawgit.com/Autodes
 
 This addin allows you to adjust the display of bodies and components in the graphics window.
 
+See a video here: https://youtu.be/pvL8eC3pYoY
+
 First you can show all components or bodies.  
 
 Alternatively, you can "Show Hidden" which will make all hidden bodies/compnents displayed and all shown entities become hidden.  Essentially inveting the hide/show state of the display.
