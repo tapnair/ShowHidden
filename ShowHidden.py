@@ -217,8 +217,8 @@ def run(context):
             SAB_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
             handlers.append(onCommandCreated)
-            SAB_Control = toolbarControlsNAV.addCommand(SAB_cmdDef)
-            SAB_Control.isVisible = True
+#            SAB_Control = toolbarControlsNAV.addCommand(SAB_cmdDef)
+#            SAB_Control.isVisible = True
         
         SAC_Control = toolbarControlsNAV.itemById(SAC_CmdId)
         if not SAC_Control:
@@ -230,8 +230,8 @@ def run(context):
             SAC_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
             handlers.append(onCommandCreated)
-            SAC_Control = toolbarControlsNAV.addCommand(SAC_cmdDef)
-            SAC_Control.isVisible = True
+#            SAC_Control = toolbarControlsNAV.addCommand(SAC_cmdDef)
+#            SAC_Control.isVisible = True
             
         SHB_Control = toolbarControlsNAV.itemById(SHB_CmdId)
         if not SHB_Control:
@@ -243,8 +243,8 @@ def run(context):
             SHB_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
             handlers.append(onCommandCreated)
-            SHB_Control = toolbarControlsNAV.addCommand(SHB_cmdDef)
-            SHB_Control.isVisible = True
+#            SHB_Control = toolbarControlsNAV.addCommand(SHB_cmdDef)
+#            SHB_Control.isVisible = True
             
         SHC_Control = toolbarControlsNAV.itemById(SHC_CmdId)
         if not SHC_Control:
@@ -256,20 +256,20 @@ def run(context):
             SHC_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
             handlers.append(onCommandCreated)
-            SHC_Control = toolbarControlsNAV.addCommand(SHC_cmdDef)
-            SHC_Control.isVisible = True
+#            SHC_Control = toolbarControlsNAV.addCommand(SHC_cmdDef)
+#            SHC_Control.isVisible = True
             
-        #Split_Control = toolbarControlsNAV.itemById(Split_CmdId)
-        #if not Split_Control:
-#            Split_cmdDef = cmdDefs.itemById(Split_CmdId)
-#            if not Split_cmdDef:
-        #[SAC_cmdDef, SHB_cmdDef, SHC_cmdDef]
-            Split_Control = toolbarControlsNAV.addSplitButton(SAB_cmdDef, [SHC_cmdDef], True)
-#            Split_Control = toolbarControlsNAV.addCommand(Split_cmdDef)
-            #Split_Control.isVisible = True
-            
-            
-            
+#        Split_Control = toolbarControlsNAV.itemById(Split_CmdId)
+#        if not Split_Control:
+        objColl = adsk.core.ObjectCollection.create()
+        objColl.add(SAC_cmdDef)
+        objColl.add(SHB_cmdDef)
+        objColl.add(SHC_cmdDef)
+        others = [SAC_cmdDef, SHB_cmdDef, SHC_cmdDef]
+        Split_Control = toolbarControlsNAV.addSplitButton(SAB_cmdDef, others, True,'','m',False)
+        #Split_Control = toolbarControlsNAV.addSplitButton(SAB_cmdDef, objColl, True)
+        Split_Control.isVisible = True
+        
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
