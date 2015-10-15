@@ -14,12 +14,11 @@ Alternatively, you can "Show Hidden" which will make all hidden bodies/compnents
 Here is a quick description of the useful workflow:
   * In a large assembly you may have some hidden bodies that are are to find in the tree that you want to show.
   * Run the addin
-  * Select: Inspect/Show Hidden
-  * Select: Show Hiddden and Bodies
+  * You will see the new icon/Dropdown menu in the lower navigation bar on your screen
+  * Select: Show Hiddden Bodies
   * Now all the previously hidden bodies will be displayed.
   * Hide the body you wanted to show originally
-  * Select: Inspect/Show Hidden
-  * Select: Show Hiddden and Bodies
+  * Select: Show Hiddden Bodiess
   * You now have the previous state with the desired bodies shown
 
 ## License
