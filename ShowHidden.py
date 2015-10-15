@@ -20,8 +20,9 @@ SAC_CmdId = 'SAC_CmdId'
 SHB_CmdId = 'SHB_CmdId'
 SHC_CmdId = 'SHC_CmdId'
 Split_CmdId = 'Split_CmdId'
+DC_CmdId = 'Show Hidden'
 
-cmdIds = [SAB_CmdId, SAC_CmdId, SHB_CmdId, SHC_CmdId]
+cmdIds = [SAB_CmdId, SAC_CmdId, SHB_CmdId, SHC_CmdId, DC_CmdId]
 
 def commandDefinitionById(id):
     app = adsk.core.Application.get()
@@ -42,8 +43,16 @@ def commandControlByIdForNav(id):
     toolbars_ = ui.toolbars
     toolbarNav_ = toolbars_.itemById('NavToolbar')
     toolbarControls_ = toolbarNav_.controls
-    toolbarControl_ = toolbarControls_.itemById(id)
-    return toolbarControl_
+    toolbarControl_ = toolbarControls_.itemById(id) 
+    dropControl = toolbarControls_.itemById(DC_CmdId)
+    toolbarControl_Drop = dropControl.controls.itemById(id)
+    if toolbarControl_Drop is not None:
+        return toolbarControl_Drop
+    
+    if toolbarControl_ is not None:
+        return toolbarControl_
+    
+    
 
 def destroyObject(uiObj, tobeDeleteObj):
     if uiObj and tobeDeleteObj:
@@ -63,9 +72,10 @@ def displayUpdate(showHidden, showBodies):
         # Get All occurences inside the root component
         allOccurences = rootComp.allOccurrences
         
-        for occurence in allOccurences:
+        for occurence in allOccurences:      
             if occurence.isLightBulbOn and showHidden:
-                occurence.isLightBulbOn = False
+                if occurence.childOccurrences.count == 0:
+                    occurence.isLightBulbOn = False
             else:
                 occurence.isLightBulbOn = True     
     
@@ -206,7 +216,7 @@ def run(context):
         toolbars_ = ui.toolbars
         navBar = toolbars_.itemById('NavToolbar')
         toolbarControlsNAV = navBar.controls
-        dropControl = toolbarControlsNAV.addDropDown('Show Hidden', commandResources) 
+        dropControl = toolbarControlsNAV.addDropDown(DC_CmdId, commandResources, DC_CmdId) 
         
         SAB_Control = toolbarControlsNAV.itemById(SAB_CmdId)
         if not SAB_Control:
