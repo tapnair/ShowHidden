@@ -1,5 +1,5 @@
 # ShowHidden
-Simple Add-in for Body/Component Display
+Fusion 360 Add-in for Body/Component Display
 
 ![showHidden Dialog](./resources/showHidden.png)
 ## Usage:
