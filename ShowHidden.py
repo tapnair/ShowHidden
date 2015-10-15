@@ -2,6 +2,7 @@
 #Description-Quickly SHow all hidden or simply show all bodies or components
 
 
+
 import adsk.core, adsk.fusion, traceback
 
 # global event handlers referenced for the duration of the command
@@ -14,38 +15,66 @@ commandId = 'showHidden'
 commandName = 'Show Hidden'
 commandDescription = 'Shows Hidden Bodies or Components'
 
-def showHidden(inputs):
-    typeInput = None
-    hideInput = None
+SAB_CmdId = 'SAB_CmdId'
+SAC_CmdId = 'SAC_CmdId'
+SHB_CmdId = 'SHB_CmdId'
+SHC_CmdId = 'SHC_CmdId'
+Split_CmdId = 'Split_CmdId'
 
-    for inputI in inputs:
-        global commandId
-        if inputI.id == commandId + '_type':
-            typeInput = inputI
-        elif inputI.id == commandId + '_hide':
-            hideInput = inputI
+cmdIds = [SAB_CmdId, SAC_CmdId, SHB_CmdId, SHC_CmdId]
+
+def commandDefinitionById(id):
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+    if not id:
+        ui.messageBox('commandDefinition id is not specified')
+        return None
+    commandDefinitions_ = ui.commandDefinitions
+    commandDefinition_ = commandDefinitions_.itemById(id)
+    return commandDefinition_
+
+def commandControlByIdForNav(id):
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+    if not id:
+        ui.messageBox('commandControl id is not specified')
+        return None
+    toolbars_ = ui.toolbars
+    toolbarNav_ = toolbars_.itemById('NavToolbar')
+    toolbarControls_ = toolbarNav_.controls
+    toolbarControl_ = toolbarControls_.itemById(id)
+    return toolbarControl_
+
+def destroyObject(uiObj, tobeDeleteObj):
+    if uiObj and tobeDeleteObj:
+        if tobeDeleteObj.isValid:
+            tobeDeleteObj.deleteMe()
+        else:
+            uiObj.messageBox('tobeDeleteObj is not a valid object')
+            
+def displayUpdate(showHidden, showBodies):
 
     app = adsk.core.Application.get()
     design = adsk.fusion.Design.cast(app.activeProduct)
    
-    if typeInput.selectedItem.name != 'Bodies':
+    if not showBodies:
         # Get the root component of the active design.
         rootComp = adsk.fusion.Component.cast(design.rootComponent)
         # Get All occurences inside the root component
         allOccurences = rootComp.allOccurrences
         
         for occurence in allOccurences:
-            if occurence.isLightBulbOn and hideInput.selectedItem.name == 'Show Hidden (Invert Display of)':
+            if occurence.isLightBulbOn and showHidden:
                 occurence.isLightBulbOn = False
             else:
                 occurence.isLightBulbOn = True     
     
-    if typeInput.selectedItem.name != 'Components':
+    if showBodies:
         allComponents = design.allComponents
         for component in allComponents:
             bodies = component.bRepBodies
             for body in bodies:
-                if body.isVisible and hideInput.selectedItem.name == 'Show Hidden (Invert Display of)':
+                if body.isVisible and showHidden:
                     body.isVisible = False
                 else: 
                     body.isVisible = True 
@@ -55,80 +84,188 @@ def run(context):
     try:
         app = adsk.core.Application.get()
         ui  = app.userInterface
-        
-        class displayInvertInputChangedHandler(adsk.core.InputChangedEventHandler):
-            def __init__(self):
-                super().__init__()
-            def notify(self, args):
-                try:
-                    cmd = args.firingEvent.sender
-                    inputs = cmd.commandInputs
-                    showHidden(inputs)
-                    adsk.doEvents()
-                except:
-                    if ui:
-                        ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
-                
-        class displayInvertExecuteHandler(adsk.core.CommandEventHandler):
-            def __init__(self):
-                super().__init__()
-            def notify(self, args):
-                try:  
-                    cmd = args.firingEvent.sender
-                    inputs = cmd.commandInputs
-                    showHidden(inputs)
-                except:
-                    if ui:
-                        ui.messageBox('command executed failed:\n{}'
-                        .format(traceback.format_exc()))
-                
-        class displayInvertCreatedHandler(adsk.core.CommandCreatedEventHandler):
+
+        class SAB_CreatedHandler(adsk.core.CommandCreatedEventHandler):
             def __init__(self):
                 super().__init__() 
             def notify(self, args):
                 try:
                     cmd = args.command
-                    onExecute = displayInvertExecuteHandler()
+                    onExecute = SAB_ExecuteHandler()
                     cmd.execute.add(onExecute)
-
-                    onInputChanged = displayInvertInputChangedHandler()
-                    cmd.inputChanged.add(onInputChanged)
                     # keep the handler referenced beyond this function
-                    handlers.append(onExecute)
-                    handlers.append(onInputChanged)
-                    inputs = cmd.commandInputs               
-                  
-                    global commandId
-                    hideInput = inputs.addDropDownCommandInput(commandId + '_hide', 'What to show?', adsk.core.DropDownStyles.TextListDropDownStyle)
-                    hideInput.listItems.add('Show All', True)
-                    hideInput.listItems.add('Show Hidden (Invert Display of)', False)
-                    
-                    typeInput = inputs.addDropDownCommandInput(commandId + '_type', 'What type?',adsk.core.DropDownStyles.TextListDropDownStyle)
-                    typeInput.listItems.add('Bodies', False)
-                    typeInput.listItems.add('Components', True)
-                    typeInput.listItems.add('Both', False)               
+                    handlers.append(onExecute)               
                 except:
                     if ui:
                         ui.messageBox('Panel command created failed:\n{}'
-                        .format(traceback.format_exc()))
-                                       
+                        .format(traceback.format_exc()))     
+
+        class SAB_ExecuteHandler(adsk.core.CommandEventHandler):
+            def __init__(self):
+                super().__init__()
+            def notify(self, args):
+                try:  
+                    showHidden = False
+                    showBodies = True
+                    displayUpdate(showHidden, showBodies)
+                except:
+                    if ui:
+                        ui.messageBox('command executed failed:\n{}'
+                        .format(traceback.format_exc()))   
+                        
+        class SAC_CreatedHandler(adsk.core.CommandCreatedEventHandler):
+            def __init__(self):
+                super().__init__() 
+            def notify(self, args):
+                try:
+                    cmd = args.command
+                    onExecute = SAC_ExecuteHandler()
+                    cmd.execute.add(onExecute)
+                    # keep the handler referenced beyond this function
+                    handlers.append(onExecute)               
+                except:
+                    if ui:
+                        ui.messageBox('Panel command created failed:\n{}'
+                        .format(traceback.format_exc()))     
+
+        class SAC_ExecuteHandler(adsk.core.CommandEventHandler):
+            def __init__(self):
+                super().__init__()
+            def notify(self, args):
+                try:
+                    showHidden = False
+                    showBodies = False
+                    displayUpdate(showHidden, showBodies)
+                except:
+                    if ui:
+                        ui.messageBox('command executed failed:\n{}'
+                        .format(traceback.format_exc()))   
+                        
+        class SHB_CreatedHandler(adsk.core.CommandCreatedEventHandler):
+            def __init__(self):
+                super().__init__() 
+            def notify(self, args):
+                try:
+                    cmd = args.command
+                    onExecute = SHB_ExecuteHandler()
+                    cmd.execute.add(onExecute)
+                    # keep the handler referenced beyond this function
+                    handlers.append(onExecute)               
+                except:
+                    if ui:
+                        ui.messageBox('Panel command created failed:\n{}'
+                        .format(traceback.format_exc()))     
+
+        class SHB_ExecuteHandler(adsk.core.CommandEventHandler):
+            def __init__(self):
+                super().__init__()
+            def notify(self, args):
+                try:
+                    showHidden = True
+                    showBodies = True
+                    displayUpdate(showHidden, showBodies)
+                except:
+                    if ui:
+                        ui.messageBox('command executed failed:\n{}'
+                        .format(traceback.format_exc()))   
+                        
+        class SHC_CreatedHandler(adsk.core.CommandCreatedEventHandler):
+            def __init__(self):
+                super().__init__() 
+            def notify(self, args):
+                try:
+                    cmd = args.command
+                    onExecute = SHC_ExecuteHandler()
+                    cmd.execute.add(onExecute)
+                    # keep the handler referenced beyond this function
+                    handlers.append(onExecute)               
+                except:
+                    if ui:
+                        ui.messageBox('Panel command created failed:\n{}'
+                        .format(traceback.format_exc()))     
+
+        class SHC_ExecuteHandler(adsk.core.CommandEventHandler):
+            def __init__(self):
+                super().__init__()
+            def notify(self, args):
+                try:
+                    showHidden = True
+                    showBodies = False
+                    displayUpdate(showHidden, showBodies)
+                except:
+                    if ui:
+                        ui.messageBox('command executed failed:\n{}'
+                        .format(traceback.format_exc()))   
+                          
         # Get the UserInterface object and the CommandDefinitions collection.
         cmdDefs = ui.commandDefinitions
-         
-        # Create a basic button command definition.
-        buttonDef = cmdDefs.addButtonDefinition(commandId, 
-                                                commandName, 
-                                                commandDescription, 
-                                                commandResources)                                               
-        # Setup Event Handler
-        onCommandCreated = displayInvertCreatedHandler()
-        buttonDef.commandCreated.add(onCommandCreated)
-        handlers.append(onCommandCreated)
 
-        # Add the controls to the Inspect toolbar panel.
-        menuPanel = ui.allToolbarPanels.itemById(menu_panel)
-        buttonControl = menuPanel.controls.addCommand(buttonDef, '')
-        buttonControl.isVisible = True
+        #global showAllBodiesCmdId
+        #otherCmdDefs = [showAllCompsCmdId, showHiddenBodiesCmdId, showHiddenCompsCmdId]
+        # add a command button on Quick Access Toolbar
+        toolbars_ = ui.toolbars
+        navBar = toolbars_.itemById('NavToolbar')
+        toolbarControlsNAV = navBar.controls
+        dropControl = toolbarControlsNAV.addDropDown('Show Hidden', commandResources) 
+        
+        SAB_Control = toolbarControlsNAV.itemById(SAB_CmdId)
+        if not SAB_Control:
+            SAB_cmdDef = cmdDefs.itemById(SAB_CmdId)
+            if not SAB_cmdDef:
+                # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
+                SAB_cmdDef = cmdDefs.addButtonDefinition(SAB_CmdId, 'Show All Bodies', 'Show all bodies in active design',commandResources)
+            onCommandCreated = SAB_CreatedHandler()
+            SAB_cmdDef.commandCreated.add(onCommandCreated)
+            # keep the handler referenced beyond this function
+            handlers.append(onCommandCreated)
+            SAB_Control = dropControl.controls.addCommand(SAB_cmdDef)
+            SAB_Control.isVisible = True
+        
+        SAC_Control = toolbarControlsNAV.itemById(SAC_CmdId)
+        if not SAC_Control:
+            SAC_cmdDef = cmdDefs.itemById(SAC_CmdId)
+            if not SAC_cmdDef:
+                # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
+                SAC_cmdDef = cmdDefs.addButtonDefinition(SAC_CmdId, 'Show All Components', 'Show all components in active design',commandResources)
+            onCommandCreated = SAC_CreatedHandler()
+            SAC_cmdDef.commandCreated.add(onCommandCreated)
+            # keep the handler referenced beyond this function
+            handlers.append(onCommandCreated)
+            SAC_Control = dropControl.controls.addCommand(SAC_cmdDef)
+            SAC_Control.isVisible = True
+            
+        SHB_Control = toolbarControlsNAV.itemById(SHB_CmdId)
+        if not SHB_Control:
+            SHB_cmdDef = cmdDefs.itemById(SHB_CmdId)
+            if not SHB_cmdDef:
+                # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
+                SHB_cmdDef = cmdDefs.addButtonDefinition(SHB_CmdId, 'Show Hidden Bodies', 'Show hidden bodies in active design',commandResources)
+            onCommandCreated = SHB_CreatedHandler()
+            SHB_cmdDef.commandCreated.add(onCommandCreated)
+            # keep the handler referenced beyond this function
+            handlers.append(onCommandCreated)
+            SHB_Control = dropControl.controls.addCommand(SHB_cmdDef)
+            SHB_Control.isVisible = True
+            
+        SHC_Control = toolbarControlsNAV.itemById(SHC_CmdId)
+        if not SHC_Control:
+            SHC_cmdDef = cmdDefs.itemById(SHC_CmdId)
+            if not SHC_cmdDef:
+                # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
+                SHC_cmdDef = cmdDefs.addButtonDefinition(SHC_CmdId, 'Show Hidden Components', 'Show hidden components in active design',commandResources)
+            onCommandCreated = SHC_CreatedHandler()
+            SHC_cmdDef.commandCreated.add(onCommandCreated)
+            # keep the handler referenced beyond this function
+            handlers.append(onCommandCreated)
+            SHC_Control = dropControl.controls.addCommand(SHC_cmdDef)
+            SHC_Control.isVisible = True
+            
+        
+        # TODO 
+        # Add split button when bug is fixed        
+        # Split_Control = toolbarControlsNAV.addSplitButton(SAB_cmdDef, others, True,'','m',False)
+        # Split_Control = toolbarControlsNAV.addSplitButton(SAB_cmdDef, objColl, True)
+        # Split_Control.isVisible = True
 
     except:
         if ui:
@@ -139,16 +276,20 @@ def stop(context):
     try:
         app = adsk.core.Application.get()
         ui  = app.userInterface
-        commandDef = ui.commandDefinitions.itemById(commandId)
-        if commandDef:
-            commandDef.deleteMe()
+
+        objArrayNav = []
         
-        # Delete the controls to the Inspect toolbar panel.
-        menuPanel = ui.allToolbarPanels.itemById(menu_panel)
-        buttonControl = menuPanel.controls.itemById(commandId)
-        if buttonControl:
-            buttonControl.deleteMe()
-        
+        for cmdId in cmdIds:
+            commandControlNav_ = commandControlByIdForNav(cmdId)
+            if commandControlNav_:
+                objArrayNav.append(commandControlNav_)
+    
+            commandDefinitionNav_ = commandDefinitionById(cmdId)
+            if commandDefinitionNav_:
+                objArrayNav.append(commandDefinitionNav_)
+            
+        for obj in objArrayNav:
+            destroyObject(ui, obj)
 
     except:
         if ui:
