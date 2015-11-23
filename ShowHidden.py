@@ -216,14 +216,14 @@ def run(context):
         toolbars_ = ui.toolbars
         navBar = toolbars_.itemById('NavToolbar')
         toolbarControlsNAV = navBar.controls
-        dropControl = toolbarControlsNAV.addDropDown(DC_CmdId, commandResources, DC_CmdId) 
+        dropControl = toolbarControlsNAV.addDropDown(DC_CmdId, commandResources + '/DC', DC_CmdId) 
         
         SAB_Control = toolbarControlsNAV.itemById(SAB_CmdId)
         if not SAB_Control:
             SAB_cmdDef = cmdDefs.itemById(SAB_CmdId)
             if not SAB_cmdDef:
                 # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
-                SAB_cmdDef = cmdDefs.addButtonDefinition(SAB_CmdId, 'Show All Bodies', 'Show all bodies in active design',commandResources)
+                SAB_cmdDef = cmdDefs.addButtonDefinition(SAB_CmdId, 'Show All Bodies', 'Show all bodies in active design',commandResources + '/SAB')
             onCommandCreated = SAB_CreatedHandler()
             SAB_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
@@ -236,7 +236,7 @@ def run(context):
             SAC_cmdDef = cmdDefs.itemById(SAC_CmdId)
             if not SAC_cmdDef:
                 # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
-                SAC_cmdDef = cmdDefs.addButtonDefinition(SAC_CmdId, 'Show All Components', 'Show all components in active design',commandResources)
+                SAC_cmdDef = cmdDefs.addButtonDefinition(SAC_CmdId, 'Show All Components', 'Show all components in active design',commandResources + '/SAC')
             onCommandCreated = SAC_CreatedHandler()
             SAC_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
@@ -249,7 +249,7 @@ def run(context):
             SHB_cmdDef = cmdDefs.itemById(SHB_CmdId)
             if not SHB_cmdDef:
                 # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
-                SHB_cmdDef = cmdDefs.addButtonDefinition(SHB_CmdId, 'Show Hidden Bodies', 'Show hidden bodies in active design',commandResources)
+                SHB_cmdDef = cmdDefs.addButtonDefinition(SHB_CmdId, 'Show Hidden Bodies', 'Show hidden bodies in active design',commandResources + '/SHB')
             onCommandCreated = SHB_CreatedHandler()
             SHB_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
@@ -262,7 +262,7 @@ def run(context):
             SHC_cmdDef = cmdDefs.itemById(SHC_CmdId)
             if not SHC_cmdDef:
                 # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
-                SHC_cmdDef = cmdDefs.addButtonDefinition(SHC_CmdId, 'Show Hidden Components', 'Show hidden components in active design',commandResources)
+                SHC_cmdDef = cmdDefs.addButtonDefinition(SHC_CmdId, 'Show Hidden Components', 'Show hidden components in active design',commandResources + '/SHC')
             onCommandCreated = SHC_CreatedHandler()
             SHC_cmdDef.commandCreated.add(onCommandCreated)
             # keep the handler referenced beyond this function
