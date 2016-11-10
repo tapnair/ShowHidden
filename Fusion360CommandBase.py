@@ -3,6 +3,70 @@ import adsk.core, adsk.fusion, traceback
 
 handlers = [] 
 
+# Removes the command control and definition 
+def cleanUpNavDropDownCommand(cmdId, DC_CmdId):
+    
+    objArrayNav = []
+    dropDownControl_ = commandControlById_in_NavBar(DC_CmdId)
+    commandControlNav_ = commandControlById_in_DropDown(cmdId, dropDownControl_)
+        
+    if commandControlNav_:
+        objArrayNav.append(commandControlNav_)
+    
+    commandDefinitionNav_ = commandDefinitionById(cmdId)
+    if commandDefinitionNav_:
+        objArrayNav.append(commandDefinitionNav_)
+        
+    for obj in objArrayNav:
+        destroyObject(obj)
+
+
+# Finds command definition in active UI
+def commandDefinitionById(cmdId):
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+    
+    if not cmdId:
+        ui.messageBox('Command Definition:  ' + cmdId + '  is not specified')
+        return None
+    commandDefinitions_ = ui.commandDefinitions
+    commandDefinition_ = commandDefinitions_.itemById(cmdId)
+    return commandDefinition_
+    
+def commandControlById_in_NavBar(cmdId):
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+    
+    if not cmdId:
+        ui.messageBox('Command Control:  ' + cmdId + '  is not specified')
+        return None
+    
+    toolbars_ = ui.toolbars
+    Nav_toolbar = toolbars_.itemById('NavToolbar')
+    Nav_toolbarControls = Nav_toolbar.controls
+    cmd_control = Nav_toolbarControls.itemById(cmdId)
+    
+    if cmd_control is not None:
+        return cmd_control
+
+# Get a commmand Control in a Nav Bar Drop Down    
+def commandControlById_in_DropDown(cmdId, dropDownControl):   
+    cmd_control = dropDownControl.controls.itemById(cmdId)
+    
+    if cmd_control is not None:
+        return cmd_control
+
+# Destroys a given object
+def destroyObject(tobeDeleteObj):
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+    
+    if ui and tobeDeleteObj:
+        if tobeDeleteObj.isValid:
+            tobeDeleteObj.deleteMe()
+        else:
+            ui.messageBox(tobeDeleteObj.id + 'is not a valid object')
+                
 class Fusion360CommandBase:
     
     def __init__(self, commandName, commandDescription, commandResources, cmdId, myWorkspace, myToolbarPanelID, debug):
@@ -156,45 +220,6 @@ class Fusion360NavCommandBase:
         except:
             if self.ui:
                 self.ui.messageBox('Couldn\'t get app or ui: {}'.format(traceback.format_exc()))
-    
-    # FInds command definition in active UI
-    def commandDefinitionById(self, id):
-
-        if not id:
-            self.ui.messageBox('commandDefinition id is not specified')
-            return None
-        commandDefinitions_ = self.ui.commandDefinitions
-        commandDefinition_ = commandDefinitions_.itemById(id)
-        return commandDefinition_
-        
-    def commandControlByIdForNav(self, id):
-
-        if not id:
-            self.ui.messageBox('commandControl id is not specified')
-            return None
-        toolbars_ = self.ui.toolbars
-        toolbarNav_ = toolbars_.itemById('NavToolbar')
-        toolbarControls_ = toolbarNav_.controls
-        toolbarControl_ = toolbarControls_.itemById(id) 
-        dropControl = toolbarControls_.itemById(self.DC_CmdId)
-        
-        if dropControl is not None:
-            toolbarControl_Drop = dropControl.controls.itemById(id)
-                
-            if toolbarControl_Drop is not None:
-                return toolbarControl_Drop
-        
-        if toolbarControl_ is not None:
-            return toolbarControl_
-        
-    def destroyObject(self, uiObj, tobeDeleteObj):
-        if uiObj and tobeDeleteObj:
-            if tobeDeleteObj.isValid:
-                tobeDeleteObj.deleteMe()
-            else:
-                uiObj.messageBox(tobeDeleteObj.id + 'is not a valid object')
-                
-    def cleanUpCommand(self, cmdId):
 
     def onPreview(self, command, inputs):
         pass
@@ -250,22 +275,18 @@ class Fusion360NavCommandBase:
     def onStop(self):
         ui = None
         try:
-            app = adsk.core.Application.get()
-            ui = app.userInterface
-                
-            objArrayNav = []
-        
-            commandControlNav_ = self.commandControlByIdForNav(self.cmdId)
-            if commandControlNav_:
-                objArrayNav.append(commandControlNav_)
-    
-            commandDefinitionNav_ = self.commandDefinitionById(self.cmdId)
-            if commandDefinitionNav_:
-                objArrayNav.append(commandDefinitionNav_)
-                
-            for obj in objArrayNav:
-                self.destroyObject(ui, obj)
-    
+            
+            dropDownControl_ = commandControlById_in_NavBar(self.DC_CmdId)
+            commandControlNav_ = commandControlById_in_DropDown(self.cmdId, dropDownControl_)
+            commandDefinitionNav_ = commandDefinitionById(self.cmdId)
+            destroyObject(commandControlNav_)
+            destroyObject(commandDefinitionNav_)
+            
+            if dropDownControl_.controls.count == 0:
+                commandDefinition_DropDown = commandDefinitionById(self.DC_CmdId)
+                destroyObject(dropDownControl_)
+                destroyObject(commandDefinition_DropDown)
+             
         except:
             if ui:
                 ui.messageBox('AddIn Stop Failed: {}'.format(traceback.format_exc()))

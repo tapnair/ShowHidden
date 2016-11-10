@@ -28,7 +28,7 @@ cmdId4 = 'SHC_CmdId'
 
 #### Define parameters for Drop Down Command #####
 DC_Resources = './resources/DC'
-DC_CmdId = 'Show Hidden5'
+DC_CmdId = 'Show Hidden2'
 
 # Set to True to display various useful messages when debugging your app
 debug = False

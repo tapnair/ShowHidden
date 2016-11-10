@@ -46,6 +46,7 @@ def commandControlByIdForNav(id):
     toolbarControl_ = toolbarControls_.itemById(id) 
     dropControl = toolbarControls_.itemById(DC_CmdId)
     toolbarControl_Drop = dropControl.controls.itemById(id)
+    
     if toolbarControl_Drop is not None:
         return toolbarControl_Drop
     
