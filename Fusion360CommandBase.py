@@ -66,7 +66,35 @@ def destroyObject(tobeDeleteObj):
             tobeDeleteObj.deleteMe()
         else:
             ui.messageBox(tobeDeleteObj.id + 'is not a valid object')
-                
+
+# Returns the id of a Toolbar Panel in the given Workspace
+def toolbarPanelById_in_Workspace(myWorkspaceID, myToolbarPanelID):
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+        
+    Allworkspaces = ui.workspaces
+    thisWorkspace = Allworkspaces.itemById(myWorkspaceID)
+    allToolbarPanels = thisWorkspace.toolbarPanels
+    ToolbarPanel_ = allToolbarPanels.itemById(myToolbarPanelID)
+    
+    return  ToolbarPanel_
+
+# Returns the Command Control from the given panel
+def commandControlById_in_Panel(cmdId, ToolbarPanel):
+    
+    app = adsk.core.Application.get()
+    ui = app.userInterface
+    
+    if not cmdId:
+        ui.messageBox('Command Control:  ' + cmdId + '  is not specified')
+        return None
+    
+    cmd_control = ToolbarPanel.controls.itemById(cmdId)
+    
+    if cmd_control is not None:
+        return cmd_control
+
+# Base Class for creating Fusion 360 Commands
 class Fusion360CommandBase:
     
     def __init__(self, commandName, commandDescription, commandResources, cmdId, myWorkspace, myToolbarPanelID, debug):
@@ -90,55 +118,10 @@ class Fusion360CommandBase:
             if self.ui:
                 self.ui.messageBox('Couldn\'t get app or ui: {}'.format(traceback.format_exc()))
     
-    # FInds command definition in active UI
-    def commandDefinitionById(self, id):
-
-        if not id:
-            self.ui.messageBox('commandDefinition id is not specified')
-            return None
-        commandDefinitions_ = self.ui.commandDefinitions
-        commandDefinition_ = commandDefinitions_.itemById(id)
-        return commandDefinition_
-    
-    
-    def toolbarPanelByID(self, id, myWorkspaceID, myToolbarPanelID):
-
-        if not id:
-            self.ui.messageBox('commandControl id is not specified')
-            return None
-        Allworkspaces = self.ui.workspaces
-        thisWorkspace = Allworkspaces.itemById(myWorkspaceID)
-        allToolbarPanels = thisWorkspace.toolbarPanels
-        thisToolbarPanel = allToolbarPanels.itemById(myToolbarPanelID)
-        
-        return  thisToolbarPanel
-    
-    def commandControlByIdForPanel(self, id):
-        
-        if not id:
-            self.ui.messageBox('commandControl id is not specified')
-            return None
-        Allworkspaces = self.ui.workspaces
-        thisWorkspace = Allworkspaces.itemById(self.myWorkspace)
-        allToolbarPanels = thisWorkspace.toolbarPanels
-        myToolbarPanel = allToolbarPanels.itemById(self.myToolbarPanelID)
-        allToolbarControls = myToolbarPanel.controls
-        
-        return  allToolbarControls.itemById(id)
-        
-    def destroyObject(self, uiObj, tobeDeleteObj):
-        if uiObj and tobeDeleteObj:
-            if tobeDeleteObj.isValid:
-                tobeDeleteObj.deleteMe()
-            else:
-                uiObj.messageBox('tobeDeleteObj is not a valid object')
-
     def onPreview(self, command, inputs):
-        pass
-    
+        pass 
     def onDestroy(self, command, inputs, reason_):    
-        pass
-    
+        pass   
     def onInputChanged(self, command, inputs, changedInput):
         pass
     def onExecute(self, command, inputs):
@@ -154,7 +137,7 @@ class Fusion360CommandBase:
             ui = app.userInterface
             commandDefinitions_ = ui.commandDefinitions
     
-            toolbarPanel_ = self.toolbarPanelByID(id, self.myWorkspace, self.myToolbarPanelID)              
+            toolbarPanel_ = toolbarPanelById_in_Workspace(id, self.myWorkspace, self.myToolbarPanelID)              
             allToolbarPanelControls_ = toolbarPanel_.controls               
             toolbarPanelControl_ = allToolbarPanelControls_.itemById(self.cmdId)
 
@@ -163,7 +146,7 @@ class Fusion360CommandBase:
                 if not commandDefinition_:
                     commandDefinition_ = commandDefinitions_.addButtonDefinition(self.cmdId, self.commandName, self.commandDescription, self.commandResources)
                 
-                onCommandCreatedHandler_ = CommandCreatedEventHandlerPanel(self)
+                onCommandCreatedHandler_ = CommandCreatedEventHandler(self)
                 commandDefinition_.commandCreated.add(onCommandCreatedHandler_)
                 handlers.append(onCommandCreatedHandler_)
                 
@@ -174,31 +157,23 @@ class Fusion360CommandBase:
             if ui:
                 ui.messageBox('AddIn Start Failed: {}'.format(traceback.format_exc()))
 
-    
     def onStop(self):
-        ui = None
         try:
             app = adsk.core.Application.get()
             ui = app.userInterface
+
+            toolbarPanel_ = toolbarPanelById_in_Workspace(id, self.myWorkspace, self.myToolbarPanelID)
             
-            
-            objArray = []
-    
-            commandControl_ = self.commandControlByIdForPanel(self.cmdId)
-            if commandControl_:
-                objArray.append(commandControl_)
-    
+            commandControlPanel_ = commandControlById_in_Panel(self.cmdId, toolbarPanel_)
             commandDefinitionPanel_ = self.commandDefinitionById(self.cmdId)
-            if commandDefinitionPanel_:
-                objArray.append(commandDefinitionPanel_)
-    
-            for obj in objArray:
-                self.destroyObject(ui, obj)
+            destroyObject(commandControlPanel_)
+            destroyObject(commandDefinitionPanel_)
 
         except:
             if ui:
                 ui.messageBox('AddIn Stop Failed: {}'.format(traceback.format_exc()))
-    
+
+# Intended to create commands in a drop down menu in the nav bar    
 class Fusion360NavCommandBase:
     
     def __init__(self, commandName, commandDescription, commandResources, cmdId, DC_CmdId, DC_Resources, debug):
@@ -259,7 +234,7 @@ class Fusion360NavCommandBase:
                     # commandDefinitionNAV = cmdDefs.addSplitButton(showAllBodiesCmdId, otherCmdDefs, True)
                     commandDefinition_ = commandDefinitions_.addButtonDefinition(self.cmdId, self.commandName, self.commandDescription, self.commandResources)
                 
-                onCommandCreatedHandler_ = CommandCreatedEventHandlerPanel(self)
+                onCommandCreatedHandler_ = CommandCreatedEventHandler(self)
                 commandDefinition_.commandCreated.add(onCommandCreatedHandler_)
                 handlers.append(onCommandCreatedHandler_)
                 
@@ -368,7 +343,7 @@ class CommandExecuteHandler(adsk.core.CommandEventHandler):
             if ui:
                 ui.messageBox('command executed failed: {}'.format(traceback.format_exc()))
 
-class CommandCreatedEventHandlerPanel(adsk.core.CommandCreatedEventHandler):
+class CommandCreatedEventHandler(adsk.core.CommandCreatedEventHandler):
     def __init__(self, myObject):
         super().__init__()
         self.myObject_ = myObject

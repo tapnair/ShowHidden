@@ -2,8 +2,9 @@ import adsk.core, adsk.fusion, traceback
 
 from .Fusion360CommandBase import Fusion360NavCommandBase
 
-
-def displayUpdate(showHidden, showBodies):
+def displayUpdateBodies(action):
+    pass
+def displayUpdate(showHidden, showBodies, showPlanes):
 
     app = adsk.core.Application.get()
     design = adsk.fusion.Design.cast(app.activeProduct)
@@ -31,15 +32,26 @@ def displayUpdate(showHidden, showBodies):
                 else: 
                     body.isVisible = True 
 
+    if showPlanes:
+        allComponents = design.allComponents
+        for component in allComponents:
+            planes = component.constructionPlanes
+            for plane in planes:
+                if plane.isLightBulbOn and showHidden:
+                    plane.isLightBulbOn = False
+                else: 
+                    plane.isLightBulbOn = True 
+                    
 ############# Create your Actions Here #################################################
 class ShowHiddenCommand(Fusion360NavCommandBase):
     
-    def __init__(self, commandName, commandDescription, commandResources, cmdId, DC_CmdId, DC_Resources, debug, showHidden, showBodies):
+    def __init__(self, commandName, commandDescription, commandResources, cmdId, DC_CmdId, DC_Resources, debug, showHidden, showBodies, showPlanes):
     
         super().__init__(commandName, commandDescription, commandResources, cmdId, DC_CmdId, DC_Resources, debug)
         # Initialize Override to get state.
         self.showHidden = showHidden
         self.showBodies = showBodies
+        self.showPlanes = showPlanes
         
          
     # Runs when Fusion command would generate a preview after all inputs are valid or changed
@@ -56,7 +68,7 @@ class ShowHiddenCommand(Fusion360NavCommandBase):
     
     # Runs when the user presses ok button
     def onExecute(self, command, inputs):
-        displayUpdate(self.showHidden, self.showBodies)  
+        displayUpdate(self.showHidden, self.showBodies, self.showPlanes)  
     
     # Runs when user selects your command from Fusion UI, Build UI here
     def onCreate(self, command, inputs):
