@@ -8,17 +8,17 @@ commandDescription1 = 'Show all bodies in active design'
 commandResources1 = './resources/SAB'
 cmdId1 = 'SAB_CmdId'
 
-#### Define parameters for 2nd command #####
-commandName2 = 'Show All Components'
-commandDescription2 = 'Show all components in active design'
-commandResources2 = './resources/SAC'
-cmdId2 = 'SAC_CmdId'
-
 #### Define parameters for 1st command #####
-commandName3 = 'Show Hidden Bodies'
-commandDescription3 = 'Show hidden bodies in active design'
-commandResources3 = './resources/SHB'
-cmdId3 = 'SHB_CmdId'
+commandName2 = 'Show Hidden Bodies'
+commandDescription2 = 'Show hidden bodies in active design'
+commandResources2 = './resources/SHB'
+cmdId2 = 'SHB_CmdId'
+
+#### Define parameters for 2nd command #####
+commandName3 = 'Show All Components'
+commandDescription3 = 'Show all components in active design'
+commandResources3 = './resources/SAC'
+cmdId3 = 'SAC_CmdId'
 
 #### Define parameters for 2nd command #####
 commandName4 = 'Show Hidden Components'
@@ -29,19 +29,19 @@ cmdId4 = 'SHC_CmdId'
 #### Define parameters for 1st command #####
 commandName5 = 'Show All Planes'
 commandDescription5 = 'Show all planes in active design'
-commandResources5 = './resources/SHB'
+commandResources5 = './resources/SAP'
 cmdId5 = 'SHP_CmdId'
 
 #### Define parameters for 2nd command #####
 commandName6 = 'Show Hidden Planes'
 commandDescription6 = 'Show hidden planes in active design'
-commandResources6 = './resources/SHC'
+commandResources6 = './resources/SHP'
 cmdId6 = 'SAP_CmdId'
 
 #### Define parameters for 2nd command #####
 commandName7 = 'Hide All Planes'
 commandDescription7 = 'Hide All in active design'
-commandResources7 = './resources/SHC'
+commandResources7 = './resources/HAP'
 cmdId7 = 'HAP_CmdId'
 
 
@@ -53,13 +53,13 @@ DC_CmdId = 'Show Hidden4'
 debug = False
 
 # Creates the commands for use in the Fusion 360 UI
-newCommand1 = ShowHiddenCommand(commandName1, commandDescription1, commandResources1, cmdId1, DC_CmdId, DC_Resources, debug, False, True, False)
-newCommand2 = ShowHiddenCommand(commandName2, commandDescription2, commandResources2, cmdId2, DC_CmdId, DC_Resources, debug, False, False, False)
-newCommand3 = ShowHiddenCommand(commandName3, commandDescription3, commandResources3, cmdId3, DC_CmdId, DC_Resources, debug, True, True, False)
-newCommand4 = ShowHiddenCommand(commandName4, commandDescription4, commandResources4, cmdId4, DC_CmdId, DC_Resources, debug, True, False, False)
-newCommand5 = ShowHiddenCommand(commandName5, commandDescription5, commandResources5, cmdId5, DC_CmdId, DC_Resources, debug, False, False, True)
-newCommand6 = ShowHiddenCommand(commandName6, commandDescription6, commandResources6, cmdId6, DC_CmdId, DC_Resources, debug, True, False, True)
-newCommand7 = ShowHiddenCommand(commandName7, commandDescription7, commandResources7, cmdId7, DC_CmdId, DC_Resources, debug, True, False, True)
+newCommand1 = ShowHiddenCommand(commandName1, commandDescription1, commandResources1, cmdId1, DC_CmdId, DC_Resources, debug, 'bodies', 'showAll')
+newCommand2 = ShowHiddenCommand(commandName2, commandDescription2, commandResources2, cmdId2, DC_CmdId, DC_Resources, debug, 'bodies', 'showHidden')
+newCommand3 = ShowHiddenCommand(commandName3, commandDescription3, commandResources3, cmdId3, DC_CmdId, DC_Resources, debug, 'components', 'showAll')
+newCommand4 = ShowHiddenCommand(commandName4, commandDescription4, commandResources4, cmdId4, DC_CmdId, DC_Resources, debug, 'components', 'showHidden')
+newCommand5 = ShowHiddenCommand(commandName5, commandDescription5, commandResources5, cmdId5, DC_CmdId, DC_Resources, debug, 'planes', 'showAll')
+newCommand6 = ShowHiddenCommand(commandName6, commandDescription6, commandResources6, cmdId6, DC_CmdId, DC_Resources, debug, 'planes', 'showHidden')
+newCommand7 = ShowHiddenCommand(commandName7, commandDescription7, commandResources7, cmdId7, DC_CmdId, DC_Resources, debug, 'planes', 'hideAll')
 #newCommand5 = Fusion360Command(commandName5, commandDescription5, commandResources5, cmdId5, myWorkspace5, myToolbarPanelID5, debug)
 #newCommand5 = Fusion360Command(commandName5, commandDescription6, commandResources6, cmdId6, myWorkspace6, myToolbarPanelID6, debug)
 
