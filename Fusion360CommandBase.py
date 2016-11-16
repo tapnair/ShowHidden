@@ -137,7 +137,7 @@ class Fusion360CommandBase:
             ui = app.userInterface
             commandDefinitions_ = ui.commandDefinitions
     
-            toolbarPanel_ = toolbarPanelById_in_Workspace(id, self.myWorkspace, self.myToolbarPanelID)              
+            toolbarPanel_ = toolbarPanelById_in_Workspace(self.myWorkspace, self.myToolbarPanelID)              
             allToolbarPanelControls_ = toolbarPanel_.controls               
             toolbarPanelControl_ = allToolbarPanelControls_.itemById(self.cmdId)
 
@@ -162,10 +162,10 @@ class Fusion360CommandBase:
             app = adsk.core.Application.get()
             ui = app.userInterface
 
-            toolbarPanel_ = toolbarPanelById_in_Workspace(id, self.myWorkspace, self.myToolbarPanelID)
+            toolbarPanel_ = toolbarPanelById_in_Workspace(self.myWorkspace, self.myToolbarPanelID)
             
             commandControlPanel_ = commandControlById_in_Panel(self.cmdId, toolbarPanel_)
-            commandDefinitionPanel_ = self.commandDefinitionById(self.cmdId)
+            commandDefinitionPanel_ = commandDefinitionById(self.cmdId)
             destroyObject(commandControlPanel_)
             destroyObject(commandDefinitionPanel_)
 

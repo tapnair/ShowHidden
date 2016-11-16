@@ -47,7 +47,7 @@ cmdId7 = 'HAP_CmdId'
 
 #### Define parameters for Drop Down Command #####
 DC_Resources = './resources/DC'
-DC_CmdId = 'Show Hidden4'
+DC_CmdId = 'Show Hidden'
 
 # Set to True to display various useful messages when debugging your app
 debug = False
